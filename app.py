@@ -1,18 +1,41 @@
-from flask import Flask, render_template, request
+import os
+import random
+from flask import Flask, render_template, request, session
 
 app = Flask(__name__)
+app.secret_key = "sandoura_secret"  # Obligatoire pour utiliser session
 
-# Page d'accueil
 @app.route("/", methods=["GET", "POST"])
-def index():
+def accueil():
     if request.method == "POST":
-        # On récupère le prénom envoyé par le formulaire
         name = request.form.get("name")
-        # Si l'utilisateur a saisi un nom, on affiche la page de salut
         if name:
-            return render_template("index.html", name=name, greeted=True)
-    # Sinon, on affiche simplement le formulaire
-    return render_template("index.html", greeted=False)
+            session["name"] = name
+            session["secret"] = random.randint(1, 20)  # Génère le nombre à deviner
+            return render_template("game.html", name=name, message="Devine le nombre !")
+    return render_template("accueil.html")
+
+@app.route("/jeu", methods=["POST"])
+def jeu():
+    guess = request.form.get("guess")
+    name = session.get("name")
+    secret = session.get("secret")
+
+    if guess:
+        guess = int(guess)
+
+        if guess == secret:
+            message = "Bravo ! 🎉 Tu as trouvé le nombre !"
+            return render_template("game.html", name=name, message=message, success=True)
+
+        elif guess < secret:
+            message = "Trop petit ! Essaie encore."
+        else:
+            message = "Trop grand ! Essaie encore."
+
+        return render_template("game.html", name=name, message=message)
+
+    return render_template("game.html", name=name, message="Entre un nombre.")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu de Devinette</title>
+</head>
+<body>
+    <h1>Bonjour {{ name }} 👋</h1>
+    <h2>{{ message }}</h2>
+
+    {% if not success %}
+    <form action="/jeu" method="POST">
+        <label>Devine un nombre entre 1 et 20 :</label><br><br>
+        <input type="number" name="guess" min="1" max="20">
+        <button type="submit">Deviner</button>
+    </form>
+    {% else %}
+    <a href="/">Rejouer</a>
+    {% endif %}
+
+</body>
+</html>
